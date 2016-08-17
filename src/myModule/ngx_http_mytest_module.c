@@ -1,75 +1,13 @@
 /*
- * Copyright (C) Igor Sysoev
- * Copyright (C) Nginx, Inc.
+ * Copyright (C) Dash
+ * Copyright (C) My Module
  */
 #include <ngx_config.h>
 #include <ngx_core.h>
 #include <ngx_http.h>
 
-struct ngx_module_s {
-	ngx_uint_t			ctx_index;	/* 当前模块在同类模块中的序号 */
-	ngx_uint_t			index;		/* 当前模块在ngx_modules数组中的序号 */
-
-	ngx_uint_t			spare0;	   /* 保留 */
-	ngx_uint_t			spare1;	   /* 保留 */
-	ngx_uint_t			spare2;	   /* 保留 */
-	ngx_uint_t			spare3;	   /* 保留 */
-
-	ngx_uint_t			version;	  /* 模块版本，目前为1 */
-
-	void				 *ctx;		  /* 指向特定类型模块的公共接口 */
-	ngx_command_t		*commands;	 /* 用于处理配置文件nginx.conf中的配置项 */
-	ngx_uint_t			type;		 /* 当前模块类型 */
-
-	/* 以下7个函数指针表示7个执行点，这些执行点将在Nginx启动和退出过程中被调用
-	 * 如果不需要则设置为NULL
-	 */
-	ngx_int_t		   (*init_master)(ngx_log_t *log);	 /* 从未被调用，设为NULL */
-
-	ngx_int_t		   (*init_module)(ngx_cycle_t *cycle); /* 启动worker子进程前调用 */
-
-	ngx_int_t		   (*init_process)(ngx_cycle_t *cycle);/* 启动worker子进程后调用 */
-	ngx_int_t		   (*init_thread)(ngx_cycle_t *cycle); /* 从未被调用，设为NULL */
-	void				(*exit_thread)(ngx_cycle_t *cycle); /* 从未被调用，设为NULL */
-	void				(*exit_process)(ngx_cycle_t *cycle);/* worker子进程推出前调用 */
-
-	void				(*exit_master)(ngx_cycle_t *cycle); /* master进程退出前调用 */
-
-	/* 以下全为保留字段 */
-	uintptr_t			 spare_hook0;
-	uintptr_t			 spare_hook1;
-	uintptr_t			 spare_hook2;
-	uintptr_t			 spare_hook3;
-	uintptr_t			 spare_hook4;
-	uintptr_t			 spare_hook5;
-	uintptr_t			 spare_hook6;
-	uintptr_t			 spare_hook7;
-};
-
-typedef struct {
-	ngx_int_t   (*preconfiguration)(ngx_conf_t *cf);	// 解析配置文件前调用
-	ngx_int_t   (*postconfiguration)(ngx_conf_t *cf);   // 解析完配置文件后调用
-
-	void	   *(*create_main_conf)(ngx_conf_t *cf);	// 创建存储直属于http{}的配置项的结构体
-	char	   *(*init_main_conf)(ngx_conf_t *cf, void *conf);  // 初始化main级别配置项
-
-	void	   *(*create_srv_conf)(ngx_conf_t *cf);	 // 创建存储直属于srv{}的配置项的结构体
-	char	   *(*merge_srv_conf)(ngx_conf_t *cf, void *prev, void *conf);  // 合并main级别和srv级别的同名配置项
-
-	void	   *(*create_loc_conf)(ngx_conf_t *cf);	 // 创建存储直属于loc{}的配置项的结构体
-	char	   *(*merge_loc_conf)(ngx_conf_t *cf, void *prev, void *conf);  // 合并srv级别和loc级别的同名配置项
-} ngx_http_module_t;
-
-truct ngx_command_s {
-	ngx_str_t			 name;	 // 配置项名称
-	ngx_uint_t			type;	 // 配置项类型，包括该配置项可以出现的位置和可以携带参数的个数
-
-	// 出现name配置项后，调用此方法解析配置项参数
-	char			   *(*set)(ngx_conf_t *cf, ngx_command_t *cmd, void *conf);
-	ngx_uint_t			conf;	 // 配置文件中的偏移量，确定将该配置项放入哪个存储结构体中
-	ngx_uint_t			offset;   // 将该配置项放在存储结构体的哪个字段
-	void				 *post;	 // 配置项读取后的处理方法
-};
+static char* ngx_http_mytest(ngx_conf_t *cf, ngx_command_t *cmd, void *conf);
+static ngx_int_t ngx_http_mytest_handler(ngx_http_request_t *r);
 
 static ngx_command_t ngx_http_mytest_commands[] = {
 	{
