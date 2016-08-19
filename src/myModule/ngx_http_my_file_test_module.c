@@ -27,11 +27,12 @@ static char* ngx_http_mytest(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 
 	// 找到mytest配置项所属的配置块
 	clcf = ngx_http_conf_get_module_loc_conf(cf, ngx_http_core_module);
-
+	
+	
 	// 设置处理请求的方法，HTTP框架在处理用户请求进行到NGX_HTTP_CONTENT_PHASE阶段时
 	// 如果主机域名、URI和mytest模块所在配置块名称相同，就会调用函数ngx_http_mytest_handler
 	clcf->handler = ngx_http_mytest_handler;
-
+	DEBUG_LOG("mount on handler")
 	return NGX_CONF_OK;
 }
 
@@ -90,7 +91,8 @@ static ngx_int_t ngx_http_mytest_handler(ngx_http_request_t *r)
 	ngx_buf_t *b;
 	b = ngx_palloc(r->pool, sizeof(ngx_buf_t));
 	u_char* filename = (u_char*) "~/index.html";
-	printf("filename%s\n", filename);
+	DEBUG_LOG("my handler ");
+	DEBUG_LOG(filename);	
 	b -> in_file = 1;
 	b -> file = ngx_pcalloc(r->pool, sizeof(ngx_file_t));
 	b -> file -> fd = ngx_open_file(filename, NGX_FILE_RDONLY|NGX_FILE_NONBLOCK, NGX_FILE_OPEN, 0);
